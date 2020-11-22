@@ -18,7 +18,7 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -138,7 +138,10 @@ public class GUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				library.deleteSong();
+				int curRow = table.getSelectedRow();
+    			String id = table.getValueAt(curRow, 0).toString();
+    			library.deleteSong(id);
+    			tableModel.removeRow(curRow);
 			}
         	
         });
@@ -160,7 +163,11 @@ public class GUI extends JFrame {
         rDelete.addActionListener(new ActionListener() {
         	@Override
 			public void actionPerformed(ActionEvent e) {
-				library.deleteSong();
+        		int curRow = table.getSelectedRow();
+    			String id = table.getValueAt(curRow, 0).toString();
+    			library.deleteSong(id);
+    			tableModel.removeRow(curRow);
+				
 			}
         	
         });
@@ -325,10 +332,7 @@ public class GUI extends JFrame {
                     result = (List) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
                     for(Object o : result) {
                         toInsert = o.toString();
-
 	            		String directory = toInsert.replace('\\','/');
-	            		
-	            		
 	            		String[] songToAdd = new String[7];
 	            		songToAdd[6] = directory;
 	            		// Now get the stuff from the mp3 tag
