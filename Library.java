@@ -179,12 +179,9 @@ public class Library {
     	}
 	}
 	
-	public void deleteSong() {
+	public void deleteSong(String id) {
 		try {
-			int curRow = gui.table.getSelectedRow();
-			String id = gui.table.getValueAt(curRow, 0).toString();
 			database.deleteSong(id);
-			gui.tableModel.removeRow(curRow);
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
