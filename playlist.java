@@ -3,6 +3,7 @@ package mp3;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
 
@@ -15,17 +16,25 @@ public class playlist {
 	private String name;
 	private GUI gui;
 	private Library library;
+	private int id;
+	private ArrayList<String[]> songs;
 	
-	public playlist(String name, GUI gui, Library lib) {
+	public playlist(String name, GUI gui, Library lib, int id) {
 		this.name = name;
 		this.gui = gui;
 		library = lib;
+		this.id = id;
+		songs = new ArrayList<>();
 	}
 	public String getName() {
 		return name;
 	}
-	public void addToPlaylist() {
-		
+	public int getId() {
+		return id;
 	}
+	public void rightAddToPlaylist(String[] song) {
+		songs.add(song);
+	}
+	
 
 }
