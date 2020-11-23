@@ -149,36 +149,41 @@ public class GUI extends JFrame {
                 // TODO Auto-generated method stub
                 String name = JOptionPane.showInputDialog(main,"Playlist name:");
                 final JPanel panel = new JPanel();
+                if(name==null || name.isBlank()) {
+                	JOptionPane.showMessageDialog(panel, "Invalid Playlist Name! Playlist name cannot be empty, please try again", "Error", JOptionPane.ERROR_MESSAGE);
+                }
                 for(playlist ply : library.getPlaylists()) {
                     if(ply.getName().compareTo(name)==0) {
                         JOptionPane.showMessageDialog(panel, "Playlist already exists, please use a different name", "Error", JOptionPane.ERROR_MESSAGE);
                         break;
                     }
                 }
-                try {
-                    JMenuItem itm = new JMenuItem(name);
-                    playlists.add(itm);
+                if(!name.isBlank() && name!=null) {
+                	try {
+                        JMenuItem itm = new JMenuItem(name);
+                        playlists.add(itm);
 
-                    itm.addActionListener(new ActionListener(){
+                        itm.addActionListener(new ActionListener(){
 
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            int currow = table.getSelectedRow();
-                            try {
-                                library.getPlaylistCalled(name).rightAddToPlaylist(library.getSong(table.getValueAt(currow,0).toString()));
-                            } catch (SQLException e1) {
-                                // TODO Auto-generated catch block
-                                e1.printStackTrace();
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                int currow = table.getSelectedRow();
+                                try {
+                                    library.getPlaylistCalled(name).rightAddToPlaylist(library.getSong(table.getValueAt(currow,0).toString()));
+                                } catch (SQLException e1) {
+                                    // TODO Auto-generated catch block
+                                    e1.printStackTrace();
+                                }
                             }
-                        }
 
-                    });
-                    library.makePlaylist(name);
-                    rootPlaylist.add(new DefaultMutableTreeNode(name));
-                    treeModel.reload();
-                } catch (SQLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                        });
+                        library.makePlaylist(name);
+                        rootPlaylist.add(new DefaultMutableTreeNode(name));
+                        treeModel.reload();
+                    } catch (SQLException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
                 }
             }
 
@@ -598,12 +603,11 @@ public class GUI extends JFrame {
         });
         
         
-        
         sidePanel = new JPanel();
         sidePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        sidePanel.setMinimumSize(new Dimension(130,250));
-        sidePanel.setMaximumSize(new Dimension(130,5000));
-        sidePanel.setPreferredSize(new Dimension(130,250));
+        sidePanel.setMinimumSize(new Dimension(120,250));
+        sidePanel.setMaximumSize(new Dimension(120,5000));
+        sidePanel.setPreferredSize(new Dimension(120,250));
         sidePanel.add(treeLibrary);
         sidePanel.add(treePlaylist);
         sideScrollPane = new JScrollPane(sidePanel);
@@ -640,10 +644,19 @@ public class GUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					
-					library.deletePlaylist(treePlaylist.getSelectionPath().getLastPathComponent().toString());
+					String nametoDelete = treePlaylist.getSelectionPath().getLastPathComponent().toString();
+					library.deletePlaylist(nametoDelete);
 					rootPlaylist.remove((DefaultMutableTreeNode)treePlaylist.getSelectionPath().getLastPathComponent());
 					treeModel.reload();
+					Component[] rightClickComp = playlists.getMenuComponents();
+					for(Component itemm : rightClickComp) {
+						JMenuItem itt = (JMenuItem)itemm;
+						if(itt.getText().compareTo(nametoDelete)==0) {
+							playlists.remove(itemm);
+							break;
+						}
+					}
+					
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
