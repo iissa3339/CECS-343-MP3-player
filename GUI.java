@@ -561,7 +561,10 @@ public class GUI extends JFrame {
             }
         });
         sidePanel = new JPanel();
-        sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
+        sidePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        sidePanel.setMinimumSize(new Dimension(150,250));
+        sidePanel.setMaximumSize(new Dimension(150,5000));
+        sidePanel.setPreferredSize(new Dimension(150,250));
         sidePanel.add(treeLibrary);
         sidePanel.add(treePlaylist);
         sideScrollPane = new JScrollPane(sidePanel);
