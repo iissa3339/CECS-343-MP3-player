@@ -27,6 +27,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import com.mpatric.mp3agic.ID3v1;
@@ -51,6 +52,7 @@ public class GUI extends JFrame {
     }
 
     DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
+    DefaultTreeModel treeModel;
 
     JTable alreadyIn;
 
@@ -168,6 +170,7 @@ public class GUI extends JFrame {
                     });
                     library.makePlaylist(name);
                     rootPlaylist.add(new DefaultMutableTreeNode(name));
+                    treeModel.reload();
                 } catch (SQLException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
@@ -584,6 +587,62 @@ public class GUI extends JFrame {
                 }
             }
         });
+        treeModel = (DefaultTreeModel) treePlaylist.getModel();
+        
+        
+        JPopupMenu treeRightClick = new JPopupMenu("playlistOption");
+        JMenuItem newWindow = new JMenuItem("Open In New Window");
+        newWindow.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+        	
+        });
+        JMenuItem deletePlaylist = new JMenuItem("Delete Playlist");
+        deletePlaylist.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					
+					library.deletePlaylist(treePlaylist.getSelectionPath().getLastPathComponent().toString());
+					rootPlaylist.remove((DefaultMutableTreeNode)treePlaylist.getSelectionPath().getLastPathComponent());
+					treeModel.reload();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+        	
+        });
+        treeRightClick.add(newWindow);
+        treeRightClick.add(deletePlaylist);
+        treePlaylist.addMouseListener(new MouseAdapter() {
+        	public void mousePressed(MouseEvent f) {
+        		showMenu(f);
+        	}
+        	public void mouseReleased(MouseEvent f) {
+        		showMenu(f);
+        	}
+        	public void showMenu(MouseEvent f) {
+        		if(f.isPopupTrigger()) {
+        			treeRightClick.show(f.getComponent(), f.getX(), f.getY());
+        		}
+        	}
+        });
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 
         main.setDropTarget(new MyDropTarget());
         main.setSize(700, 500);
