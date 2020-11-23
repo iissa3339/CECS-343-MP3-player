@@ -155,4 +155,9 @@ public class myDB {
 		String query = "INSERT INTO `"+ playlistName + "`(`SongId`) VALUES ("+songID+")";
 		statement.execute(query);
 	}
+	public void deletePlaylist(String name) throws SQLException {
+		// TODO Auto-generated method stub
+		String query = "DROP TABLE `"+name+"`;";
+		statement.execute(query);
+	}
 }
