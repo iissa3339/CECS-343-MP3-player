@@ -18,12 +18,14 @@ public class playlist {
 	private Library library;
 	private int id;
 	private ArrayList<String[]> songs;
+	private myDB database;
 	
-	public playlist(String name, GUI gui, Library lib, int id) {
+	public playlist(String name, GUI gui, myDB data, Library lib, int id) {
 		this.name = name;
 		this.gui = gui;
 		library = lib;
 		this.id = id;
+		database = data;
 		songs = new ArrayList<>();
 	}
 	public String getName() {
@@ -32,8 +34,9 @@ public class playlist {
 	public int getId() {
 		return id;
 	}
-	public void rightAddToPlaylist(String[] song) {
+	public void rightAddToPlaylist(String[] song) throws SQLException {
 		songs.add(song);
+		database.rightAddToPlaylist(name, song[0]);
 	}
 	
 
