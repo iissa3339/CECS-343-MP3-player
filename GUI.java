@@ -3,6 +3,7 @@ import javazoom.jlgui.basicplayer.BasicPlayerException;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -60,7 +61,7 @@ public class GUI extends JFrame {
     JScrollPane scrollPane;
     JMenuBar menuBar;
     JMenu file;
-    JMenuItem open, exit, add, delete;
+    JMenuItem open, exit, add, create, delete;
     JPopupMenu rightClick;
     
     
@@ -87,12 +88,15 @@ public class GUI extends JFrame {
         open = new JMenuItem("Open");
         add = new JMenuItem("Add");
         delete= new JMenuItem("Delete");
+        create = new JMenuItem("Create Playlist");
         exit = new JMenuItem("Exit");
+        JMenu playlists = new JMenu("Add to playlist");
         
 
         file.add(open);
         file.add(add);
         file.add(delete);
+        file.add(create);
         file.add(exit);
 
         menuBar.add(file);
@@ -117,7 +121,48 @@ public class GUI extends JFrame {
 				}
             }
         });
+        
+        create.addActionListener(new ActionListener() {
 
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				String name = JOptionPane.showInputDialog(main,"Playlist name:");
+				final JPanel panel = new JPanel();
+				for(playlist ply : library.getPlaylists()) {
+					if(ply.getName().compareTo(name)==0) {
+						JOptionPane.showMessageDialog(panel, "Playlist already exists, please use a different name", "Error", JOptionPane.ERROR_MESSAGE);
+						break;
+					}
+				}
+				try {
+					JMenuItem itm = new JMenuItem(name);
+		        	itm.setAccelerator(KeyStroke.getKeyStroke(
+		        	        KeyEvent.VK_2, ActionEvent.ALT_MASK));
+		        	playlists.add(itm);
+		        	
+		        	itm.addActionListener(new ActionListener(){
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							int currow = table.getSelectedRow();
+							try {
+								library.getPlaylistCalled(name).rightAddToPlaylist(library.getSong(table.getValueAt(currow,0).toString()));
+							} catch (SQLException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}					
+						}
+		        		
+		        	});
+					library.makePlaylist(name);
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+        	
+        });
 
         exit.addActionListener(new ActionListener() {
             @Override
@@ -171,9 +216,15 @@ public class GUI extends JFrame {
 			}
         	
         });
-        PopupMenu playlists = new PopupMenu();
+        
+        
+        playlists.setMnemonic(KeyEvent.VK_S);
         for(playlist pls : library.getPlaylists()) {
-        	MenuItem itm = new MenuItem(pls.getName());
+        	JMenuItem itm = new JMenuItem(pls.getName());
+        	itm.setAccelerator(KeyStroke.getKeyStroke(
+        	        KeyEvent.VK_2, ActionEvent.ALT_MASK));
+        	playlists.add(itm);
+        	
         	itm.addActionListener(new ActionListener(){
 
 				@Override
@@ -188,48 +239,14 @@ public class GUI extends JFrame {
 				}
         		
         	});
-        	playlists.add(itm);
-        }
-        //rightClick.add
-        JMenuItem rPlaylist = new JMenuItem("Add to playlist");
-    
-        rPlaylist.addMouseListener(new MouseListener() {
         	
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
-				rPlaylist.add(playlists);
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
-				rPlaylist.remove(playlists);
-			}
-        	
-        });
+        }        
         
         rightClick.add(rAdd);
         rightClick.add(rDelete);
-        rightClick.add(rPlaylist);
+        rightClick.addSeparator();
+        rightClick.add(playlists);
+        
 
 
         table.addMouseListener(new MouseAdapter() {
@@ -309,6 +326,7 @@ public class GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
+                	pause.setText("Pause");
                     player.stop();
                 } catch (BasicPlayerException ex) {
                     ex.printStackTrace();
