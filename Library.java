@@ -229,4 +229,9 @@ public class Library {
 		}
 		return null;
 	}
+
+	public void deletePlaylist(String name) throws SQLException {
+		// TODO Auto-generated method stub
+		database.deletePlaylist(name);
+	}
 }
