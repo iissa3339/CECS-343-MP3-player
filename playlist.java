@@ -38,6 +38,8 @@ public class playlist {
 		songs.add(song);
 		database.rightAddToPlaylist(name, song[0]);
 	}
-	
+	public ArrayList<String[]> getSongs(){
+		return songs;
+	}
 
 }
