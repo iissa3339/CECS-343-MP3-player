@@ -147,7 +147,9 @@ public class myDB {
 				"WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA='mp3'";
 		ResultSet names = statement.executeQuery(query);
 		while(names.next()) {
-			nms.add(names.getString("TABLE_NAME"));
+			if(names.getString("TABLE_NAME").compareTo("songs")!=0) {
+				nms.add(names.getString("TABLE_NAME"));
+			}
 		}
 		return nms;
 	}
