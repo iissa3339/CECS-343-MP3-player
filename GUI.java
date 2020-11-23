@@ -54,7 +54,7 @@ public class GUI extends JFrame {
     DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
     DefaultTreeModel treeModel;
 
-    JTable alreadyIn;
+    
 
     int rowPlaying;
 
@@ -75,16 +75,18 @@ public class GUI extends JFrame {
     JPanel sidePanel;
     JSlider volume;
     JScrollPane sideScrollPane;
+    
 
 
     public GUI() throws SQLException {
+    	//playlistPane.hide();
         //Button for bottom
         play = new JButton("Play");
         pause = new JButton("Pause");
         stop = new JButton("Stop");
         previous = new JButton("Previous");
         next = new JButton("Next");
-        alreadyIn = library.getSongs();
+        JTable alreadyIn = library.getSongs();
 
         String[] columns = {"Song ID", "Title", "Artist", "Genre", "Release Year", "Comments"};
         tableModel.setColumnIdentifiers(columns);
@@ -106,6 +108,9 @@ public class GUI extends JFrame {
 
         // This is for the side panel
         DefaultMutableTreeNode rootPlaylist = new DefaultMutableTreeNode("Playlist");
+        
+        
+        
         
 
         file.add(open);
@@ -552,20 +557,48 @@ public class GUI extends JFrame {
         }
 
         treeLibrary = new JTree(rootLibrary);
+        treeLibrary.addMouseListener(new MouseAdapter() {
+        	public void mouseClicked(MouseEvent e) {
+        		treePlaylist.clearSelection();
+        		TreePath tp = treePlaylist.getPathForLocation(e.getX(), e.getY());
+                if (tp != null) {
+                    tableModel.setRowCount(0);
+                    try {
+                    	JTable getsongs = library.getSongs();
+						for(int n = 0; n < getsongs.getRowCount(); n++) {
+						    String[] data = {getsongs.getValueAt(n, 0).toString() , getsongs.getValueAt(n, 1).toString() , getsongs.getValueAt(n, 2).toString()
+						            , getsongs.getValueAt(n, 3).toString() , getsongs.getValueAt(n, 4).toString() , getsongs.getValueAt(n, 5).toString()};
+						    tableModel.addRow(data);
+						}
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+                                        
+                }	
+        	}
+        });
+        
+        
         treePlaylist = new JTree(rootPlaylist);
         treePlaylist.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+            	treeLibrary.clearSelection();
                 TreePath tp = treePlaylist.getPathForLocation(e.getX(), e.getY());
-                if (tp != null)
-                    //jtf.setText(tp.toString());
-                    System.out.println(tp.toString());
-                else
-                    System.out.println("");
-                //jtf.setText("");
-
+                if (tp != null) {
+                    tableModel.setRowCount(0);
+                    for(String[] det : library.getPlaylistCalled(treePlaylist.getSelectionPath().getLastPathComponent().toString()).getSongs()) {
+                    	tableModel.addRow(det);
+                    }
+                                        
+                }	
+                
             }
         });
+        
+        
+        
         sidePanel = new JPanel();
         sidePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         sidePanel.setMinimumSize(new Dimension(130,250));
@@ -636,14 +669,6 @@ public class GUI extends JFrame {
         
         
         
-        
-        
-        
-        
-        
-        
-        
-
         main.setDropTarget(new MyDropTarget());
         main.setSize(700, 500);
         main.add(scrollPane);
