@@ -18,7 +18,7 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
+import java.awt.event.MouseListener;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -171,8 +171,65 @@ public class GUI extends JFrame {
 			}
         	
         });
+        PopupMenu playlists = new PopupMenu();
+        for(playlist pls : library.getPlaylists()) {
+        	MenuItem itm = new MenuItem(pls.getName());
+        	itm.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					int currow = table.getSelectedRow();
+					try {
+						pls.rightAddToPlaylist(library.getSong(table.getValueAt(currow,0).toString()));
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}					
+				}
+        		
+        	});
+        	playlists.add(itm);
+        }
+        //rightClick.add
+        JMenuItem rPlaylist = new JMenuItem("Add to playlist");
+    
+        rPlaylist.addMouseListener(new MouseListener() {
+        	
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				rPlaylist.add(playlists);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				rPlaylist.remove(playlists);
+			}
+        	
+        });
+        
         rightClick.add(rAdd);
         rightClick.add(rDelete);
+        rightClick.add(rPlaylist);
 
 
         table.addMouseListener(new MouseAdapter() {
