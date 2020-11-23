@@ -32,9 +32,10 @@ public class Library {
     	
 	}
 	
+	private int index = 1;
 	public void makePlaylist(String name) {
-		playlists.add(new playlist(name,gui,this));
-		
+		playlists.add(new playlist(name,gui,this,index));
+		index++;
 	}
 	
 	public void addSong() {
@@ -205,6 +206,15 @@ public class Library {
 			songToAdd[0] = database.getIDAdded();
 			gui.tableModel.addRow(songToAdd);
 		}
+	}
+	
+	public ArrayList<playlist> getPlaylists(){
+		return playlists;
+	}
+	
+	public String[] getSong(String ID) throws SQLException {
+		String[] toReturn = database.getSong(ID);
+		return toReturn;
 	}
 	
 }
