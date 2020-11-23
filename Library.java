@@ -17,24 +17,28 @@ import javazoom.jlgui.basicplayer.BasicPlayer;
 import javazoom.jlgui.basicplayer.BasicPlayerException;
 
 public class Library {
-	private myDB database = new myDB();
+	private myDB database = new myDB(this);
 	private GUI gui;
 	private BasicPlayer player;
 	private ArrayList<playlist> playlists;
+	private int index = 1;
+	
 	
 	public Library(GUI gui, BasicPlayer play) throws SQLException {
 		this.gui = gui;
 		playlists = new ArrayList<>();
 		player = play;
 		database.connect();
-
     	database.clearDatabaseTable();
+    	for(String g : database.getTablesNames()) {
+    		playlists.add(new playlist(g,gui,database,this,index));
+    	}
     	
 	}
 	
-	private int index = 1;
-	public void makePlaylist(String name) {
-		playlists.add(new playlist(name,gui,this,index));
+	public void makePlaylist(String name) throws SQLException {
+		playlists.add(new playlist(name,gui,database,this,index));
+		database.makeTable(name);
 		index++;
 	}
 	
@@ -49,8 +53,9 @@ public class Library {
 		String directory = wrongdirectory.replace('\\','/');
 		
 		
-		String[] songToAdd = new String[7];
+		String[] songToAdd = new String[8];
 		songToAdd[6] = directory;
+		songToAdd[7] = "Null";
 		// Now get the stuff from the mp3 tag
 		
 		// Store the songID
@@ -216,5 +221,12 @@ public class Library {
 		String[] toReturn = database.getSong(ID);
 		return toReturn;
 	}
-	
+	public playlist getPlaylistCalled(String name) {
+		for(playlist nb : playlists) {
+			if(nb.getName().compareTo(name)==0) {
+				return nb;
+			}
+		}
+		return null;
+	}
 }
