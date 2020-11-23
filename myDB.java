@@ -67,7 +67,8 @@ public class myDB {
 		}
 		if(! found) {
 			query = "INSERT INTO `songs`(`Song Id`, `Title`, `Artist`, `Genre`, `Release Year`, `Comments`, `Location`) VALUES (";
-			query += details[0] + ",\"" + details[1] + "\",\"" + details[2] + "\",\"" + details[3] + "\"," + details[4] + ",\"" + details[5]+ "\",\"" + details[6] +"\")";
+			query += details[0] + ",\"" + details[1] + "\",\"" + details[2] + "\",\"" + details[3] + "\"," + details[4] + ",\"" + 
+			details[5]+ "\",\"" + details[6] +"\",\"" + details[7] +"\")";
 			statement.execute(query);
 			String secondQueryToGetID = "SELECT `Song Id` FROM `songs` WHERE `Location`=\""+details[6]+"\"";
 			ResultSet ids = statement.executeQuery(secondQueryToGetID);
@@ -86,7 +87,7 @@ public class myDB {
 	}
 	
 	public String getLocation(String ID) throws SQLException {
-		String query = "SELECT `Song Id`, `Title`, `Artist`, `Genre`, `Release Year`, `Comments`, `Location` FROM `songs` WHERE `Song Id`="+ID;
+		String query = "SELECT `Song Id`, `Title`, `Artist`, `Genre`, `Release Year`, `Comments`, `Location`, `playlists` FROM `songs` WHERE `Song Id`="+ID;
 		ResultSet song = statement.executeQuery(query);
 		String location = null;
 		while(song.next()) {
@@ -100,6 +101,16 @@ public class myDB {
 	}
 	public String getIDAdded() {
 		return idAdded;
+	}
+	// This will return the playlists associated with the song
+	public String getPlaylists(String ID) throws SQLException {
+		String query = "SELECT `Song Id`, `Title`, `Artist`, `Genre`, `Release Year`, `Comments`, `Location`, `playlists` FROM `songs` WHERE `Song Id`="+ID;
+		ResultSet song = statement.executeQuery(query);
+		String Playlists = null;
+		while(song.next()) {
+			Playlists = song.getString("playlists");
+		}
+		return Playlists;
 	}
 	
 }
