@@ -105,7 +105,7 @@ public class myDB {
 		String query = "TRUNCATE songs";
 		statement.execute(query);
 		for(String name : this.getTablesNames()) {
-			query = "TRUNCATE "+name;
+			query = "TRUNCATE `"+name+"`";
 			statement.execute(query);
 		}
 	}
@@ -137,7 +137,7 @@ public class myDB {
 		return songg;
 	}
 	public void makeTable(String tableName) throws SQLException {
-		String query = "CREATE TABLE " + tableName + " (SongId int);";
+		String query = "CREATE TABLE `" + tableName + "` (SongId int);";
 		statement.execute(query);
 	}
 	public ArrayList<String> getTablesNames() throws SQLException{
