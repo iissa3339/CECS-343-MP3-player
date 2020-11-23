@@ -15,11 +15,14 @@ public class myDB {
 	private String user = "root";
 	private String password = "";
 	private String url = "jdbc:mysql://localhost:3306/mp3";
-	
+	private Library library;
 	Connection connection;
 	Statement statement;
 	
 	private String idAdded = "Null";
+	public myDB(Library lib) {
+		library = lib;
+	}
 	public void connect() {
 		// TODO Auto-generated method stub
 		System.out.println("Connecting to mp3 ...");
@@ -34,14 +37,14 @@ public class myDB {
 
 	public JTable getSongs() throws SQLException {
 		// TODO Auto-generated method stub
-		String[] columns = {"Song ID", "Title", "Artist", "Genre", "Release Year", "Comments"};
+		String[] columns = {"SongId", "Title", "Artist", "Genre", "Release Year", "Comments"};
 		// This line selects the table from the database
 		ResultSet rs = statement.executeQuery("SELECT * FROM `songs`");
 		ArrayList<Object[]> dataList = new ArrayList<>();
 		// This means loop until there's no more rows left
 		int x = 0;
 		while(rs.next()) {
-			Object[] theArray = {Integer.toString(rs.getInt("Song Id")),rs.getString("Title"),
+			Object[] theArray = {Integer.toString(rs.getInt("SongId")),rs.getString("Title"),
 					rs.getString("Artist"), rs.getString("Genre"), rs.getString("Release Year"),
 					rs.getString("Comments")};
 			
@@ -66,14 +69,14 @@ public class myDB {
 			}
 		}
 		if(! found) {
-			query = "INSERT INTO `songs`(`Song Id`, `Title`, `Artist`, `Genre`, `Release Year`, `Comments`, `Location`) VALUES (";
+			query = "INSERT INTO `songs`(`SongId`, `Title`, `Artist`, `Genre`, `Release Year`, `Comments`, `Location`, `playlists`) VALUES (";
 			query += details[0] + ",\"" + details[1] + "\",\"" + details[2] + "\",\"" + details[3] + "\"," + details[4] + ",\"" + 
 			details[5]+ "\",\"" + details[6] +"\",\"" + details[7] +"\")";
 			statement.execute(query);
-			String secondQueryToGetID = "SELECT `Song Id` FROM `songs` WHERE `Location`=\""+details[6]+"\"";
+			String secondQueryToGetID = "SELECT `SongId` FROM `songs` WHERE `Location`=\""+details[6]+"\"";
 			ResultSet ids = statement.executeQuery(secondQueryToGetID);
 			while(ids.next()) {
-				idAdded = Integer.toString(ids.getInt("Song Id"));
+				idAdded = Integer.toString(ids.getInt("SongId"));
 				break;
 			}
 			added = true;
@@ -81,13 +84,16 @@ public class myDB {
 		return added;
 		
 	}
+	
 	public void deleteSong(String ID) throws SQLException {
-		String query = "DELETE FROM `songs` WHERE `Song Id`="+ID;
-		statement.execute(query);
+		for(playlist table : library.getPlaylists()) {
+			String query = "DELETE FROM `"+table.getName()+"` WHERE `SongId`="+ID;
+			statement.execute(query);
+		}
 	}
 	
 	public String getLocation(String ID) throws SQLException {
-		String query = "SELECT `Song Id`, `Title`, `Artist`, `Genre`, `Release Year`, `Comments`, `Location`, `playlists` FROM `songs` WHERE `Song Id`="+ID;
+		String query = "SELECT `SongId`, `Title`, `Artist`, `Genre`, `Release Year`, `Comments`, `Location`, `playlists` FROM `songs` WHERE `SongId`="+ID;
 		ResultSet song = statement.executeQuery(query);
 		String location = null;
 		while(song.next()) {
@@ -98,13 +104,17 @@ public class myDB {
 	public void clearDatabaseTable() throws SQLException {
 		String query = "TRUNCATE songs";
 		statement.execute(query);
+		for(String name : this.getTablesNames()) {
+			query = "TRUNCATE "+name;
+			statement.execute(query);
+		}
 	}
 	public String getIDAdded() {
 		return idAdded;
 	}
 	// This will return the playlists associated with the song
 	public String getPlaylists(String ID) throws SQLException {
-		String query = "SELECT `Song Id`, `Title`, `Artist`, `Genre`, `Release Year`, `Comments`, `Location`, `playlists` FROM `songs` WHERE `Song Id`="+ID;
+		String query = "SELECT `SongId`, `Title`, `Artist`, `Genre`, `Release Year`, `Comments`, `Location`, `playlists` FROM `songs` WHERE `SongId`="+ID;
 		ResultSet song = statement.executeQuery(query);
 		String Playlists = null;
 		while(song.next()) {
@@ -113,11 +123,11 @@ public class myDB {
 		return Playlists;
 	}
 	public String[] getSong(String ID) throws SQLException {
-		String query = "SELECT `Song Id`, `Title`, `Artist`, `Genre`, `Release Year`, `Comments`, `Location`, `playlists` FROM `songs` WHERE `Song Id`="+ID;
+		String query = "SELECT `SongId`, `Title`, `Artist`, `Genre`, `Release Year`, `Comments`, `Location`, `playlists` FROM `songs` WHERE `SongId`="+ID;
 		ResultSet song = statement.executeQuery(query);
 		String[] songg = new String[6];
 		while(song.next()) {
-			songg[0] = song.getString("Song Id");
+			songg[0] = song.getString("SongId");
 			songg[1] = song.getString("Title");
 			songg[2] = song.getString("Artist");
 			songg[3] = song.getString("Genre");
@@ -125,5 +135,24 @@ public class myDB {
 			songg[5] = song.getString("Comments");
 		}
 		return songg;
+	}
+	public void makeTable(String tableName) throws SQLException {
+		String query = "CREATE TABLE " + tableName + " (SongId int);";
+		statement.execute(query);
+	}
+	public ArrayList<String> getTablesNames() throws SQLException{
+		ArrayList<String> nms = new ArrayList<>();
+		String query = "SELECT TABLE_NAME \r\n" + 
+				"FROM INFORMATION_SCHEMA.TABLES\r\n" + 
+				"WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA='mp3'";
+		ResultSet names = statement.executeQuery(query);
+		while(names.next()) {
+			nms.add(names.getString("TABLE_NAME"));
+		}
+		return nms;
+	}
+	public void rightAddToPlaylist(String playlistName, String songID) throws SQLException {
+		String query = "INSERT INTO `"+ playlistName + "`(`SongId`) VALUES ("+songID+")";
+		statement.execute(query);
 	}
 }
