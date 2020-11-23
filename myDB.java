@@ -112,5 +112,18 @@ public class myDB {
 		}
 		return Playlists;
 	}
-	
+	public String[] getSong(String ID) throws SQLException {
+		String query = "SELECT `Song Id`, `Title`, `Artist`, `Genre`, `Release Year`, `Comments`, `Location`, `playlists` FROM `songs` WHERE `Song Id`="+ID;
+		ResultSet song = statement.executeQuery(query);
+		String[] songg = new String[6];
+		while(song.next()) {
+			songg[0] = song.getString("Song Id");
+			songg[1] = song.getString("Title");
+			songg[2] = song.getString("Artist");
+			songg[3] = song.getString("Genre");
+			songg[4] = song.getString("Release Year");
+			songg[5] = song.getString("Comments");
+		}
+		return songg;
+	}
 }
