@@ -1,3 +1,5 @@
+package mp3;
+
 import javazoom.jlgui.basicplayer.BasicPlayerException;
 
 import java.awt.event.ActionEvent;
@@ -100,6 +102,9 @@ public class GUI extends JFrame {
         exit = new JMenuItem("Exit");
         JMenu playlists = new JMenu("Add to playlist");
 
+        // This is for the side panel
+        DefaultMutableTreeNode rootPlaylist = new DefaultMutableTreeNode("Playlist");
+        
 
         file.add(open);
         file.add(add);
@@ -145,8 +150,6 @@ public class GUI extends JFrame {
                 }
                 try {
                     JMenuItem itm = new JMenuItem(name);
-                    itm.setAccelerator(KeyStroke.getKeyStroke(
-                            KeyEvent.VK_2, ActionEvent.ALT_MASK));
                     playlists.add(itm);
 
                     itm.addActionListener(new ActionListener(){
@@ -164,6 +167,7 @@ public class GUI extends JFrame {
 
                     });
                     library.makePlaylist(name);
+                    rootPlaylist.add(new DefaultMutableTreeNode(name));
                 } catch (SQLException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
@@ -229,8 +233,6 @@ public class GUI extends JFrame {
         playlists.setMnemonic(KeyEvent.VK_S);
         for(playlist pls : library.getPlaylists()) {
             JMenuItem itm = new JMenuItem(pls.getName());
-            itm.setAccelerator(KeyStroke.getKeyStroke(
-                    KeyEvent.VK_2, ActionEvent.ALT_MASK));
             playlists.add(itm);
 
             itm.addActionListener(new ActionListener(){
@@ -542,9 +544,10 @@ public class GUI extends JFrame {
 
         //Side Panel Trees
         DefaultMutableTreeNode rootLibrary = new DefaultMutableTreeNode("Library");
-        DefaultMutableTreeNode rootPlaylist = new DefaultMutableTreeNode("Playlist");
-        rootPlaylist.add(new DefaultMutableTreeNode("Example One"));
-        rootPlaylist.add(new DefaultMutableTreeNode("Example two"));
+        for(playlist lst : library.getPlaylists()) {
+        	rootPlaylist.add(new DefaultMutableTreeNode(lst.getName()));
+        }
+
         treeLibrary = new JTree(rootLibrary);
         treePlaylist = new JTree(rootPlaylist);
         treePlaylist.addMouseListener(new MouseAdapter() {
@@ -562,9 +565,9 @@ public class GUI extends JFrame {
         });
         sidePanel = new JPanel();
         sidePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        sidePanel.setMinimumSize(new Dimension(150,250));
-        sidePanel.setMaximumSize(new Dimension(150,5000));
-        sidePanel.setPreferredSize(new Dimension(150,250));
+        sidePanel.setMinimumSize(new Dimension(130,250));
+        sidePanel.setMaximumSize(new Dimension(130,5000));
+        sidePanel.setPreferredSize(new Dimension(130,250));
         sidePanel.add(treeLibrary);
         sidePanel.add(treePlaylist);
         sideScrollPane = new JScrollPane(sidePanel);
@@ -590,6 +593,7 @@ public class GUI extends JFrame {
         main.add(menuBar, BorderLayout.NORTH);
         main.add(sideScrollPane,BorderLayout.WEST);
     }
+   
 
     public void go() {
         main.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
