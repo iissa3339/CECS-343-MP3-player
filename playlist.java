@@ -44,6 +44,11 @@ public class playlist {
 		return songs;
 	}
 	public void deleteSong(String[] songgg) {
-		songs.remove(songgg);		
+		for(String[] ss : songs) {
+			if(ss[0].compareTo(songgg[0])==0) {
+				songs.remove(ss);
+				break;
+			}
+		}		
 	}
 }
