@@ -242,4 +242,7 @@ public class Library {
 	public void rightDeleteFromPlay(String id, String play) throws SQLException {
 		database.deleteSongFromPlaylist(id, play);
 	}
+	public int hasSong(String title) throws SQLException {
+		return database.hasSong(title);
+	}
 }
