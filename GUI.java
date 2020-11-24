@@ -4,6 +4,8 @@ import javazoom.jlgui.basicplayer.BasicPlayerException;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +22,6 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -41,8 +42,9 @@ public class GUI extends JFrame {
     private BasicPlayer player = new BasicPlayer();
     Library library = new Library(this, player);
 
-    JFrame main = new JFrame("Music Player by Jeffrey Viramontes & Issa Issa");
+    JFrame main = new JFrame("MyTunes Music Player by Jeffrey Viramontes & Issa Issa");
     JTable table = new JTable();
+    
 
     public Component getFrame() {
         return main;
@@ -55,11 +57,12 @@ public class GUI extends JFrame {
     DefaultTreeModel treeModel;
 
     
+    
+    
 
     int rowPlaying;
 
     boolean paused = false;
-
     JButton play;
     JButton pause;
     JButton stop;
@@ -79,6 +82,7 @@ public class GUI extends JFrame {
 
 
     public GUI() throws SQLException {
+    	
     	//playlistPane.hide();
         //Button for bottom
         play = new JButton("Play");
@@ -109,7 +113,7 @@ public class GUI extends JFrame {
         // This is for the side panel
         DefaultMutableTreeNode rootPlaylist = new DefaultMutableTreeNode("Playlist");
         
-        
+        table.setDragEnabled(true);
         
         
 
@@ -178,8 +182,11 @@ public class GUI extends JFrame {
 
                         });
                         library.makePlaylist(name);
-                        rootPlaylist.add(new DefaultMutableTreeNode(name));
+                        DefaultMutableTreeNode toCreated = new DefaultMutableTreeNode(name);
+                        rootPlaylist.add(toCreated);
                         treeModel.reload();
+                        treePlaylist.addSelectionInterval(rootPlaylist.getIndex(toCreated)+1, rootPlaylist.getIndex(toCreated)+1);
+                        tableModel.setRowCount(0);
                     } catch (SQLException e1) {
                         // TODO Auto-generated catch block
                         e1.printStackTrace();
@@ -199,7 +206,8 @@ public class GUI extends JFrame {
         add.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                library.addSong();
+                String[] addedd = library.addSong(main);
+                tableModel.addRow(addedd);
             }
         });
 
@@ -224,7 +232,8 @@ public class GUI extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                library.addSong();
+                String[] detttail = library.addSong(main);
+                tableModel.addRow(detttail);
             }
         });
 
@@ -431,7 +440,7 @@ public class GUI extends JFrame {
                     for(Object o : result) {
                         toInsert = o.toString();
                         String directory = toInsert.replace('\\','/');
-                        String[] songToAdd = new String[7];
+                        String[] songToAdd = new String[8];
                         songToAdd[6] = directory;
                         // Now get the stuff from the mp3 tag
 
@@ -542,6 +551,7 @@ public class GUI extends JFrame {
                             songToAdd[5] = "Unknown";
                         }
                         try {
+                        	songToAdd[7] = "";
                             library.insertSong(songToAdd);
                         } catch (SQLException e1) {
                             // TODO Auto-generated catch block
@@ -592,11 +602,12 @@ public class GUI extends JFrame {
             	treeLibrary.clearSelection();
                 TreePath tp = treePlaylist.getPathForLocation(e.getX(), e.getY());
                 if (tp != null) {
-                    tableModel.setRowCount(0);
-                    for(String[] det : library.getPlaylistCalled(treePlaylist.getSelectionPath().getLastPathComponent().toString()).getSongs()) {
-                    	tableModel.addRow(det);
-                    }
-                                        
+                	if(treePlaylist.getSelectionPath().getLastPathComponent().toString().compareTo("Playlists")!=0) {
+                		tableModel.setRowCount(0);
+                        for(String[] det : library.getPlaylistCalled(treePlaylist.getSelectionPath().getLastPathComponent().toString()).getSongs()) {
+                        	tableModel.addRow(det);
+                        }
+                	}                   
                 }	
                 
             }
@@ -630,11 +641,22 @@ public class GUI extends JFrame {
         JPopupMenu treeRightClick = new JPopupMenu("playlistOption");
         JMenuItem newWindow = new JMenuItem("Open In New Window");
         newWindow.addActionListener(new ActionListener() {
-
+	        
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
+				new playlistGUI(GUI.this, library, player);
+				tableModel.setRowCount(0);
+                try {
+                	JTable getsongs = library.getSongs();
+					for(int n = 0; n < getsongs.getRowCount(); n++) {
+					    String[] data = {getsongs.getValueAt(n, 0).toString() , getsongs.getValueAt(n, 1).toString() , getsongs.getValueAt(n, 2).toString()
+					            , getsongs.getValueAt(n, 3).toString() , getsongs.getValueAt(n, 4).toString() , getsongs.getValueAt(n, 5).toString()};
+					    tableModel.addRow(data);
+					}
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
         	
         });
@@ -645,17 +667,21 @@ public class GUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					String nametoDelete = treePlaylist.getSelectionPath().getLastPathComponent().toString();
-					library.deletePlaylist(nametoDelete);
-					rootPlaylist.remove((DefaultMutableTreeNode)treePlaylist.getSelectionPath().getLastPathComponent());
-					treeModel.reload();
-					Component[] rightClickComp = playlists.getMenuComponents();
-					for(Component itemm : rightClickComp) {
-						JMenuItem itt = (JMenuItem)itemm;
-						if(itt.getText().compareTo(nametoDelete)==0) {
-							playlists.remove(itemm);
-							break;
+					int input = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete "+nametoDelete+"?");
+					// 0 = yes, 1=no, 2=cancel
+					if(input == 0) {
+						library.deletePlaylist(nametoDelete);
+						rootPlaylist.remove((DefaultMutableTreeNode)treePlaylist.getSelectionPath().getLastPathComponent());
+						treeModel.reload();
+						Component[] rightClickComp = playlists.getMenuComponents();
+						for(Component itemm : rightClickComp) {
+							JMenuItem itt = (JMenuItem)itemm;
+							if(itt.getText().compareTo(nametoDelete)==0) {
+								playlists.remove(itemm);
+								break;
+							}
 						}
-					}
+					}					
 					
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
@@ -679,8 +705,7 @@ public class GUI extends JFrame {
         		}
         	}
         });
-        
-        
+       
         
         main.setDropTarget(new MyDropTarget());
         main.setSize(700, 500);
@@ -689,6 +714,8 @@ public class GUI extends JFrame {
         main.add(keys, BorderLayout.SOUTH);
         main.add(menuBar, BorderLayout.NORTH);
         main.add(sideScrollPane,BorderLayout.WEST);
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		main.setLocation((dim.width/2-main.getSize().width/2)-40, (dim.height/2-main.getSize().height/2)-25);
     }
    
 
@@ -696,4 +723,12 @@ public class GUI extends JFrame {
         main.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         main.setVisible(true);
     }
+	public boolean songInTable(String[] addedd) {
+		for(int h = 0; h < tableModel.getRowCount(); h++) {
+			if(tableModel.getValueAt(h, 1).toString().compareTo(addedd[1])==0) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
