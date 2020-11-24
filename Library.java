@@ -236,4 +236,10 @@ public class Library {
 		// TODO Auto-generated method stub
 		database.deletePlaylist(name);
 	}
+	public void rightAddToLibrary(String[] n) throws SQLException {
+		database.addSong(n);
+	}
+	public void rightDeleteFromPlay(String id, String play) throws SQLException {
+		database.deleteSongFromPlaylist(id, play);
+	}
 }
