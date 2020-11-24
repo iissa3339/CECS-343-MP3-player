@@ -4,8 +4,6 @@ import javazoom.jlgui.basicplayer.BasicPlayerException;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
@@ -150,6 +148,7 @@ public class GUI extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+            	treeLibrary.clearSelection();
                 // TODO Auto-generated method stub
                 String name = JOptionPane.showInputDialog(main,"Playlist name:");
                 final JPanel panel = new JPanel();
@@ -740,17 +739,18 @@ public class GUI extends JFrame {
         		}
         	}
         });
+        
        
         
         main.setDropTarget(new MyDropTarget());
-        main.setSize(700, 500);
+        main.setSize(900, 500);
         main.add(scrollPane);
         keys.add(volume);
         main.add(keys, BorderLayout.SOUTH);
         main.add(menuBar, BorderLayout.NORTH);
         main.add(sideScrollPane,BorderLayout.WEST);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		main.setLocation((dim.width/2-main.getSize().width/2)-40, (dim.height/2-main.getSize().height/2)-25);
+		main.setLocation((dim.width/2-main.getSize().width/2)-40, (dim.height/2-main.getSize().height/2)-50);
     }
    
 
@@ -765,5 +765,15 @@ public class GUI extends JFrame {
 			}
 		}
 		return false;
+	}
+	public String[] getDataFromRow(int ind) {
+		String[] songDetail = new String[6];
+		songDetail[0] = table.getValueAt(ind, 0).toString();
+		songDetail[1] = table.getValueAt(ind, 1).toString();
+		songDetail[2] = table.getValueAt(ind, 2).toString();
+		songDetail[3] = table.getValueAt(ind, 3).toString();
+		songDetail[4] = table.getValueAt(ind, 4).toString();
+		songDetail[5] = table.getValueAt(ind, 5).toString();
+		return songDetail;
 	}
 }
