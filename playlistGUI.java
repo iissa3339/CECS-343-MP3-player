@@ -1,10 +1,13 @@
 package mp3;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.sql.SQLException;
 
@@ -15,6 +18,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTable;
@@ -29,17 +33,19 @@ public class playlistGUI {
 	private GUI gui;
 	private Library library;
 	private BasicPlayer player;
+	private playlist playlis;
 	private boolean listpaused = false;
 	private int listRowPlaying;
-	JTable playTable = new JTable();
+	private JMenu rToPlaylist;
+	private JTable playTable = new JTable();
 	DefaultTableModel tablenew = (DefaultTableModel) playTable.getModel();
 	JSlider volume;
 	
-	public playlistGUI(GUI Gui, Library lib, BasicPlayer pl) {
+	public playlistGUI(GUI Gui, Library lib, BasicPlayer pl, playlist playlis) {
 		gui = Gui;
 		library = lib;
 		player = pl;
-
+		this.playlis = playlis;
 		JFrame playFrame = new JFrame(gui.treePlaylist.getSelectionPath().getLastPathComponent().toString());
 		playFrame.setSize(700, 500);
 		// This is used to have the jframe be centered in the middle of the screen
@@ -243,6 +249,85 @@ public class playlistGUI {
 
         });
         
+        JPopupMenu rightClick = new JPopupMenu("Popup");
+        JMenuItem rAdd = new JMenuItem("Add song to Library");
+        rAdd.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	int roww = playTable.getSelectedRow();
+                String[] deta = {tablenew.getValueAt(roww, 0).toString(), tablenew.getValueAt(roww, 1).toString(),
+                		tablenew.getValueAt(roww, 2).toString(), tablenew.getValueAt(roww, 3).toString(),
+                		tablenew.getValueAt(roww, 4).toString(), tablenew.getValueAt(roww, 5).toString(),};
+                if(gui.songInTable(deta)==false) {
+                	gui.tableModel.addRow(deta);
+                }
+                try {
+					String[] toAdd = {deta[0],deta[1],deta[2],deta[3],deta[4],deta[5],library.getLocation(deta[0]),""};
+					library.rightAddToLibrary(toAdd);
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+            }
+        });
+        rToPlaylist = new JMenu("Add to Playlist");
+        for(playlist pls : library.getPlaylists()) {
+            JMenuItem itm = new JMenuItem(pls.getName());
+            rToPlaylist.add(itm);
+            itm.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int currow = playTable.getSelectedRow();
+                    try {
+                        pls.rightAddToPlaylist(library.getSong(playTable.getValueAt(currow,0).toString()));
+                    } catch (SQLException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+                }
+            });
+        }
+        JMenuItem rDeleteCur = new JMenuItem("Delete currently selected song");
+        rDeleteCur.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+                try {
+                	int curRow = playTable.getSelectedRow();
+                    String id = playTable.getValueAt(curRow, 0).toString();
+					playlis.deleteSong(library.getSong(id));
+					library.rightDeleteFromPlay(id, playlis.getName());
+					tablenew.removeRow(curRow);
+					
+					
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+                
+			}       	
+        });
+        rightClick.add(rAdd);
+        rightClick.add(rToPlaylist);
+        rightClick.addSeparator();
+        rightClick.add(rDeleteCur);
+        playTable.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                showPopup(e);
+            }
+            public void mouseReleased(MouseEvent me)
+            {
+                showPopup(me);
+            }
+            private void showPopup(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    rightClick.show(e.getComponent(),
+                            e.getX(), e.getY());
+                }
+            }
+
+        });
         
         playFrame.add(menuBar, BorderLayout.NORTH);
 	}
@@ -254,4 +339,19 @@ public class playlistGUI {
 		}
 		return false;
 	}
+	public void onePlaylistDeleted(String nametoDelete) {
+		Component[] rightClickComp = rToPlaylist.getMenuComponents();
+		for(Component itemm : rightClickComp) {
+			JMenuItem itt = (JMenuItem)itemm;
+			if(itt.getText().compareTo(nametoDelete)==0) {
+				rToPlaylist.remove(itemm);
+				break;
+			}
+		}
+	}
+	public void onePlaylistAdded(String name) {
+		JMenuItem itm = new JMenuItem(name);
+		rToPlaylist.add(itm);
+	}
+	
 }
