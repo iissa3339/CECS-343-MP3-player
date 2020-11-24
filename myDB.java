@@ -166,4 +166,14 @@ public class myDB {
 		String query = "DELETE FROM `"+playlist+"` WHERE `SongId`="+ID;
 		statement.execute(query);
 	}
+	public int hasSong(String title) throws SQLException {
+		int idAdded = -1;
+		String queryToGetID = "SELECT `SongId` FROM `songs` WHERE `Title`=\""+title+"\"";
+		ResultSet ids = statement.executeQuery(queryToGetID);
+		while(ids.next()) {
+			idAdded = ids.getInt("SongId");
+			break;
+		}
+		return idAdded;
+	}
 }
