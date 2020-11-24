@@ -599,17 +599,32 @@ public class GUI extends JFrame {
         treePlaylist.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-            	treeLibrary.clearSelection();
-                TreePath tp = treePlaylist.getPathForLocation(e.getX(), e.getY());
-                if (tp != null) {
-                	if(treePlaylist.getSelectionPath().getLastPathComponent().toString().compareTo("Playlists")!=0) {
-                		tableModel.setRowCount(0);
-                        for(String[] det : library.getPlaylistCalled(treePlaylist.getSelectionPath().getLastPathComponent().toString()).getSongs()) {
-                        	tableModel.addRow(det);
-                        }
-                	}                   
-                }	
-                
+            	if(e.getClickCount()==2) {
+            		treeLibrary.clearSelection();
+                    TreePath tp = treePlaylist.getPathForLocation(e.getX(), e.getY());
+                    if (tp != null) {
+                    	if(treePlaylist.getSelectionPath().getLastPathComponent().toString().compareTo("Playlist")!=0) {
+                    		tableModel.setRowCount(0);
+                            for(String[] det : library.getPlaylistCalled(treePlaylist.getSelectionPath().getLastPathComponent().toString()).getSongs()) {
+                            	tableModel.addRow(det);
+                            }
+                    	} 
+                    	else {
+                    		if(treePlaylist.getVisibleRowCount()>1) {
+                    			int row = treePlaylist.getRowCount() - 1;
+                    	        while (row > 0) {
+                    	          treePlaylist.collapseRow(row);
+                    	          row--;
+                    	        }
+                    		}
+                    		else {
+                    			for(int i=1;i<treePlaylist.getRowCount();++i){
+                    		        treePlaylist.expandRow(i);
+                    		    }
+                    		}
+                    	}
+                    }	
+            	}                
             }
         });
         
@@ -644,7 +659,7 @@ public class GUI extends JFrame {
 	        
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new playlistGUI(GUI.this, library, player);
+				new playlistGUI(GUI.this, library, player,library.getPlaylistCalled(treePlaylist.getSelectionPath().getLastPathComponent().toString()));
 				tableModel.setRowCount(0);
                 try {
                 	JTable getsongs = library.getSongs();
