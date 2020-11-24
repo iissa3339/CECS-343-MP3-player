@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JTable;
 
 import com.mpatric.mp3agic.ID3v1;
@@ -42,11 +43,11 @@ public class Library {
 		index++;
 	}
 	
-	public void addSong() {
+	public String[] addSong(JFrame frm) {
 		final JFileChooser fc = new JFileChooser();
 		File f = new File("C:/Users/iissa/Desktop/CECS 343/Semester_Project/songs to play");
 		fc.setCurrentDirectory(f);
-		fc.showOpenDialog(gui.getFrame());
+		fc.showOpenDialog(frm);
 		File selected = fc.getSelectedFile();
 		String wrongdirectory = selected.getPath();
 		
@@ -168,12 +169,13 @@ public class Library {
 			boolean done = database.addSong(songToAdd);
 			if(done) {
 				songToAdd[0] = database.getIDAdded();
-				gui.tableModel.addRow(songToAdd);
+				return songToAdd;
 			}
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		return songToAdd;
 	}
 	
 	public void playSong(String location) throws BasicPlayerException {
