@@ -35,11 +35,15 @@ public class playlist {
 		return id;
 	}
 	public void rightAddToPlaylist(String[] song) throws SQLException {
-		songs.add(song);
-		database.rightAddToPlaylist(name, song[0]);
+		if(songs.contains(song)==false) {
+			songs.add(song);
+			database.rightAddToPlaylist(name, song[0]);
+		}
 	}
 	public ArrayList<String[]> getSongs(){
 		return songs;
 	}
-
+	public void deleteSong(String[] songgg) {
+		songs.remove(songgg);		
+	}
 }
