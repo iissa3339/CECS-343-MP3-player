@@ -162,4 +162,8 @@ public class myDB {
 		String query = "DROP TABLE `"+name+"`;";
 		statement.execute(query);
 	}
+	public void deleteSongFromPlaylist(String ID, String playlist) throws SQLException {
+		String query = "DELETE FROM `"+playlist+"` WHERE `SongId`="+ID;
+		statement.execute(query);
+	}
 }
