@@ -59,7 +59,7 @@ public class playlistGUI {
 		player = pl;
 		this.playlis = playlis;
 		JFrame playFrame = new JFrame(gui.treePlaylist.getSelectionPath().getLastPathComponent().toString());
-		playFrame.setSize(700, 500);
+		playFrame.setSize(900, 500);
 		// This is used to have the jframe be centered in the middle of the screen
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		playFrame.setLocation(dim.width/2-playFrame.getSize().width/2, dim.height/2-playFrame.getSize().height/2);
@@ -189,16 +189,15 @@ public class playlistGUI {
         playFrame.add(playKeys, BorderLayout.SOUTH);
         JMenuBar menuBar = new JMenuBar();
         JMenu file;
-        JMenuItem open, add, delete, exit;
+        JMenuItem open, add, delete;
         file = new JMenu("File");
         open = new JMenuItem("Open");
         add = new JMenuItem("Add");
         delete= new JMenuItem("Delete");
-        exit = new JMenuItem("Exit");
         file.add(open);
         file.add(add);
         file.add(delete);
-        file.add(exit);
+        
 
         menuBar.add(file);
 
@@ -220,12 +219,6 @@ public class playlistGUI {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
-            }
-        });
-        exit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
             }
         });
 
@@ -343,145 +336,167 @@ public class playlistGUI {
         class MyDropTarget extends DropTarget{
             String toInsert = null;
             public void drop(DropTargetDropEvent evt) {
-                try {
-                    evt.acceptDrop(DnDConstants.ACTION_COPY);
-                    List result = new ArrayList<>();
-                    result = (List) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-                    for(Object o : result) {
-                        toInsert = o.toString();
-                        String directory = toInsert.replace('\\','/');
-                        String[] songToAdd = new String[8];
-                        songToAdd[6] = directory;
-                        // Now get the stuff from the mp3 tag
+            	boolean isRow = false;
+            	for(DataFlavor flv : evt.getTransferable().getTransferDataFlavors()) {
+            		if(flv.equals(DataFlavor.javaFileListFlavor)) {
+            			isRow = false;
+            			break;
+            		}
+            		else {
+            			isRow = true;
+            		}
+            	}
+            	if(!isRow) {
+            		try {
+                        evt.acceptDrop(DnDConstants.ACTION_COPY);
+                        List result = new ArrayList<>();
+                        result = (List) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                        for(Object o : result) {
+                            toInsert = o.toString();
+                            String directory = toInsert.replace('\\','/');
+                            String[] songToAdd = new String[8];
+                            songToAdd[6] = directory;
+                            // Now get the stuff from the mp3 tag
 
-                        // Store the songID
-                        /*
-                        if(playTable.getRowCount()>=1) {
                             songToAdd[0] = "Null";
-                        }
-                        else {
-                            songToAdd[0] = "1";
-                        }
-						*/
-                        songToAdd[0] = "Null";
 
-                        Mp3File mp3file = null;
-                        try {
-                            mp3file = new Mp3File(directory);
-                        } catch (UnsupportedTagException | InvalidDataException | IOException e1) {
-                            // TODO Auto-generated catch block
-                            System.out.println("The directory is not right and the mp3file wasn't made");
-                            e1.printStackTrace();
+                            Mp3File mp3file = null;
+                            try {
+                                mp3file = new Mp3File(directory);
+                            } catch (UnsupportedTagException | InvalidDataException | IOException e1) {
+                                // TODO Auto-generated catch block
+                                System.out.println("The directory is not right and the mp3file wasn't made");
+                                e1.printStackTrace();
 
-                        }
+                            }             
 
+                            if (mp3file != null && mp3file.hasId3v1Tag()){
+                                ID3v1 id3v1Tag = mp3file.getId3v1Tag();
 
-                        if (mp3file != null && mp3file.hasId3v1Tag()){
-                            ID3v1 id3v1Tag = mp3file.getId3v1Tag();
+                                if(id3v1Tag.getTitle()!=null) {
+                                    songToAdd[1] = id3v1Tag.getTitle();
+                                }
+                                else {
+                                    songToAdd[1] = "Unknown";
+                                }
 
-                            if(id3v1Tag.getTitle()!=null) {
-                                songToAdd[1] = id3v1Tag.getTitle();
+                                if(id3v1Tag.getArtist()!=null) {
+                                    songToAdd[2] = id3v1Tag.getArtist();
+                                }
+                                else {
+                                    songToAdd[2] = "Unknown";
+                                }
+
+                                if(id3v1Tag.getGenreDescription()!=null) {
+                                    songToAdd[3] = id3v1Tag.getGenreDescription();
+                                }
+                                else {
+                                    songToAdd[3] = "Unknown";
+                                }
+
+                                if(id3v1Tag.getYear()!=null) {
+                                    songToAdd[4] = id3v1Tag.getYear();
+                                }
+                                else {
+                                    songToAdd[4] = "0";
+                                }
+
+                                if(id3v1Tag.getComment()!=null) {
+                                    songToAdd[5] = id3v1Tag.getComment();
+                                }
+                                else {
+                                    songToAdd[5] = "";
+                                }
+
                             }
+                            else if(mp3file != null && mp3file.hasId3v2Tag()) {
+                                ID3v1 id3v2Tag = mp3file.getId3v2Tag();
+
+                                if(id3v2Tag.getTitle()!=null) {
+                                    songToAdd[1] = id3v2Tag.getTitle();
+                                }
+                                else {
+                                    songToAdd[1] = "Unknown";
+                                }
+
+                                if(id3v2Tag.getArtist()!=null) {
+                                    songToAdd[2] = id3v2Tag.getArtist();
+                                }
+                                else {
+                                    songToAdd[2] = "Unknown";
+                                }
+
+                                if(id3v2Tag.getGenreDescription()!=null) {
+                                    songToAdd[3] = id3v2Tag.getGenreDescription();
+                                }
+                                else {
+                                    songToAdd[3] = "Unknown";
+                                }
+
+                                if(id3v2Tag.getYear()!=null) {
+                                    songToAdd[4] = id3v2Tag.getYear();
+                                }
+                                else {
+                                    songToAdd[4] = "0";
+                                }
+
+                                if(id3v2Tag.getComment()!=null) {
+                                    songToAdd[5] = id3v2Tag.getComment();
+                                }
+                                else {
+                                    songToAdd[5] = "";
+                                }
+                            }
+
                             else {
                                 songToAdd[1] = "Unknown";
-                            }
-
-                            if(id3v1Tag.getArtist()!=null) {
-                                songToAdd[2] = id3v1Tag.getArtist();
-                            }
-                            else {
                                 songToAdd[2] = "Unknown";
-                            }
-
-                            if(id3v1Tag.getGenreDescription()!=null) {
-                                songToAdd[3] = id3v1Tag.getGenreDescription();
-                            }
-                            else {
                                 songToAdd[3] = "Unknown";
-                            }
-
-                            if(id3v1Tag.getYear()!=null) {
-                                songToAdd[4] = id3v1Tag.getYear();
-                            }
-                            else {
                                 songToAdd[4] = "0";
+                                songToAdd[5] = "Unknown";
                             }
-
-                            if(id3v1Tag.getComment()!=null) {
-                                songToAdd[5] = id3v1Tag.getComment();
-                            }
-                            else {
-                                songToAdd[5] = "";
-                            }
-
-                        }
-                        else if(mp3file != null && mp3file.hasId3v2Tag()) {
-                            ID3v1 id3v2Tag = mp3file.getId3v2Tag();
-
-                            if(id3v2Tag.getTitle()!=null) {
-                                songToAdd[1] = id3v2Tag.getTitle();
+                            int idCheck = library.hasSong(songToAdd[1]);
+                            if(idCheck > -1) {
+                                songToAdd[0] = Integer.toString(idCheck);
+                                
                             }
                             else {
-                                songToAdd[1] = "Unknown";
+                                songToAdd[0] = "Null";
                             }
-
-                            if(id3v2Tag.getArtist()!=null) {
-                                songToAdd[2] = id3v2Tag.getArtist();
+                            try {
+                            	songToAdd[7] = "";
+                                library.insertSong(songToAdd);
+                                playlis.rightAddToPlaylist(songToAdd);
+                                tablenew.setRowCount(0);
+                                for(String[] newSong : library.getPlaylistCalled(gui.treePlaylist.getSelectionPath().getLastPathComponent().toString()).getSongs()) {
+                        			tablenew.addRow(newSong);
+                        		}
+                            } catch (SQLException e1) {
+                                // TODO Auto-generated catch block
+                                e1.printStackTrace();
                             }
-                            else {
-                                songToAdd[2] = "Unknown";
-                            }
-
-                            if(id3v2Tag.getGenreDescription()!=null) {
-                                songToAdd[3] = id3v2Tag.getGenreDescription();
-                            }
-                            else {
-                                songToAdd[3] = "Unknown";
-                            }
-
-                            if(id3v2Tag.getYear()!=null) {
-                                songToAdd[4] = id3v2Tag.getYear();
-                            }
-                            else {
-                                songToAdd[4] = "0";
-                            }
-
-                            if(id3v2Tag.getComment()!=null) {
-                                songToAdd[5] = id3v2Tag.getComment();
-                            }
-                            else {
-                                songToAdd[5] = "";
-                            }
-                        }
-
-                        else {
-                            songToAdd[1] = "Unknown";
-                            songToAdd[2] = "Unknown";
-                            songToAdd[3] = "Unknown";
-                            songToAdd[4] = "0";
-                            songToAdd[5] = "Unknown";
-                        }
-                        try {
-                        	songToAdd[7] = "";
-                            library.insertSong(songToAdd);
-                            playlis.rightAddToPlaylist(songToAdd);
-                            tablenew.setRowCount(0);
-                            for(String[] newSong : library.getPlaylistCalled(gui.treePlaylist.getSelectionPath().getLastPathComponent().toString()).getSongs()) {
-                    			tablenew.addRow(newSong);
-                    		}
-                        } catch (SQLException e1) {
-                            // TODO Auto-generated catch block
-                            e1.printStackTrace();
                         }
                     }
-                }
-                catch (Exception ex){
-                    ex.printStackTrace();
-                }
+                    catch (Exception ex){
+                        ex.printStackTrace();
+                    }
+            	}
+            	else {
+            		try {
+	            		int[] selectedRows = gui.table.getSelectedRows();
+	            		for(int row : selectedRows) {
+	            			String[] songg = gui.getDataFromRow(row);
+	            			tablenew.addRow(songg);
+	                        playlis.rightAddToPlaylist(songg);
+	            		}
+            		}catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            	}
             }
         }
         playFrame.setDropTarget(new MyDropTarget());
-        
         playFrame.add(menuBar, BorderLayout.NORTH);
 	}
 	public boolean songInTable(String[] addedd) {
