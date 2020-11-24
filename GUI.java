@@ -241,12 +241,20 @@ public class GUI extends JFrame {
         JMenuItem rDelete = new JMenuItem("Delete");
         rDelete.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                int curRow = table.getSelectedRow();
-                String id = table.getValueAt(curRow, 0).toString();
-                library.deleteSong(id);
-                tableModel.removeRow(curRow);
-
+            public void actionPerformed(ActionEvent e) {  
+				try {
+					int curRow = table.getSelectedRow();
+	                String id = table.getValueAt(curRow, 0).toString();
+					String[] theSong = library.getSong(id);
+					library.deleteSong(id);
+	                tableModel.removeRow(curRow);
+	                library.getPlaylistCalled(treePlaylist.getSelectionPath().getLastPathComponent().toString()).deleteSong(theSong);;
+	                
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+                
             }
 
         });
@@ -433,6 +441,7 @@ public class GUI extends JFrame {
         class MyDropTarget extends DropTarget{
             String toInsert = null;
             public void drop(DropTargetDropEvent evt) {
+            	
                 try {
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
                     List result = new ArrayList<>();
@@ -444,16 +453,9 @@ public class GUI extends JFrame {
                         songToAdd[6] = directory;
                         // Now get the stuff from the mp3 tag
 
-                        // Store the songID
-
-                        if(table.getRowCount()>=1) {
-                            songToAdd[0] = "Null";
-                        }
-                        else {
-                            songToAdd[0] = "1";
-                        }
-
-
+                        
+						
+                        
                         Mp3File mp3file = null;
                         try {
                             mp3file = new Mp3File(directory);
@@ -542,7 +544,7 @@ public class GUI extends JFrame {
                                 songToAdd[5] = "";
                             }
                         }
-
+            
                         else {
                             songToAdd[1] = "Unknown";
                             songToAdd[2] = "Unknown";
@@ -550,10 +552,26 @@ public class GUI extends JFrame {
                             songToAdd[4] = "0";
                             songToAdd[5] = "Unknown";
                         }
+                        // Store the songID
+                        int idCheck = library.hasSong(songToAdd[1]);
+                        if(idCheck > -1) {
+                            songToAdd[0] = Integer.toString(idCheck);
+                            
+                        }
+                        else {
+                            songToAdd[0] = "Null";
+                        }
                         try {
                         	songToAdd[7] = "";
                             library.insertSong(songToAdd);
-                        } catch (SQLException e1) {
+                            if(treeLibrary.isSelectionEmpty() && treePlaylist.getSelectionPath().getLastPathComponent().toString().compareTo("Playlist")!=0) {
+                            	library.getPlaylistCalled(treePlaylist.getSelectionPath().getLastPathComponent().toString()).rightAddToPlaylist(songToAdd);
+                            	tableModel.setRowCount(0);
+                                for(String[] det : library.getPlaylistCalled(treePlaylist.getSelectionPath().getLastPathComponent().toString()).getSongs()) {
+                                	tableModel.addRow(det);
+                                }
+                            }
+                            } catch (SQLException e1) {
                             // TODO Auto-generated catch block
                             e1.printStackTrace();
                         }
@@ -567,11 +585,13 @@ public class GUI extends JFrame {
 
         //Side Panel Trees
         DefaultMutableTreeNode rootLibrary = new DefaultMutableTreeNode("Library");
+        
         for(playlist lst : library.getPlaylists()) {
         	rootPlaylist.add(new DefaultMutableTreeNode(lst.getName()));
         }
 
         treeLibrary = new JTree(rootLibrary);
+        treeLibrary.addSelectionInterval(0, 0);
         treeLibrary.addMouseListener(new MouseAdapter() {
         	public void mouseClicked(MouseEvent e) {
         		treePlaylist.clearSelection();
@@ -599,8 +619,8 @@ public class GUI extends JFrame {
         treePlaylist.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+            	treeLibrary.clearSelection();
             	if(e.getClickCount()==2) {
-            		treeLibrary.clearSelection();
                     TreePath tp = treePlaylist.getPathForLocation(e.getX(), e.getY());
                     if (tp != null) {
                     	if(treePlaylist.getSelectionPath().getLastPathComponent().toString().compareTo("Playlist")!=0) {
