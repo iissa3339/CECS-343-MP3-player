@@ -38,6 +38,7 @@ public class playlist {
 		if(songs.contains(song)==false) {
 			songs.add(song);
 			database.rightAddToPlaylist(name, song[0]);
+			playlistGUI.refresh(gui.getgui(name));
 		}
 	}
 	public ArrayList<String[]> getSongs(){
