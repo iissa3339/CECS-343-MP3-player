@@ -39,6 +39,7 @@ import com.mpatric.mp3agic.UnsupportedTagException;
 public class GUI extends JFrame {
     private BasicPlayer player = new BasicPlayer();
     Library library = new Library(this, player);
+    ArrayList<playlistGUI> playGUIs;
 
     JFrame main = new JFrame("MyTunes Music Player by Jeffrey Viramontes & Issa Issa");
     JTable table = new JTable();
@@ -80,7 +81,7 @@ public class GUI extends JFrame {
 
 
     public GUI() throws SQLException {
-    	
+    	playGUIs = new ArrayList<>();
     	//playlistPane.hide();
         //Button for bottom
         play = new JButton("Play");
@@ -678,7 +679,7 @@ public class GUI extends JFrame {
 	        
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new playlistGUI(GUI.this, library, player,library.getPlaylistCalled(treePlaylist.getSelectionPath().getLastPathComponent().toString()));
+				playGUIs.add(new playlistGUI(GUI.this, library, player,library.getPlaylistCalled(treePlaylist.getSelectionPath().getLastPathComponent().toString())));
 				tableModel.setRowCount(0);
                 try {
                 	JTable getsongs = library.getSongs();
@@ -715,7 +716,8 @@ public class GUI extends JFrame {
 								break;
 							}
 						}
-					}					
+					}
+					getgui(nametoDelete).close();
 					
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
@@ -775,5 +777,13 @@ public class GUI extends JFrame {
 		songDetail[4] = table.getValueAt(ind, 4).toString();
 		songDetail[5] = table.getValueAt(ind, 5).toString();
 		return songDetail;
+	}
+	public playlistGUI getgui(String name) {
+		for(playlistGUI g : playGUIs) {
+			if(g.getName().compareTo(name)==0) {
+				return g;
+			}
+		}
+		return null;
 	}
 }
