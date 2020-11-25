@@ -52,13 +52,14 @@ public class playlistGUI {
 	private JTable playTable = new JTable();
 	DefaultTableModel tablenew = (DefaultTableModel) playTable.getModel();
 	JSlider volume;
+	private JFrame playFrame;
 	
 	public playlistGUI(GUI Gui, Library lib, BasicPlayer pl, playlist playlis) {
 		gui = Gui;
 		library = lib;
 		player = pl;
 		this.playlis = playlis;
-		JFrame playFrame = new JFrame(gui.treePlaylist.getSelectionPath().getLastPathComponent().toString());
+		playFrame = new JFrame(gui.treePlaylist.getSelectionPath().getLastPathComponent().toString());
 		playFrame.setSize(900, 500);
 		// This is used to have the jframe be centered in the middle of the screen
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -520,6 +521,22 @@ public class playlistGUI {
 	public void onePlaylistAdded(String name) {
 		JMenuItem itm = new JMenuItem(name);
 		rToPlaylist.add(itm);
+	}
+	public void refresh() {
+		tablenew.setRowCount(0);
+        for(String[] newSong : playlis.getSongs()) {
+			tablenew.addRow(newSong);
+		}
+	}
+	public static void refresh(playlistGUI gui) {
+		gui.refresh();
+	}
+	public String getName() {
+		return playlis.getName();
+	}
+	public void close() {
+		// TODO Auto-generated method stub
+		playFrame.hide();
 	}
 	
 }
