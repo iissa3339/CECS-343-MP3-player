@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -60,13 +61,16 @@ public class Library {
 		// Now get the stuff from the mp3 tag
 		
 		// Store the songID
-		
+		Random ran = new Random();
+		songToAdd[0] = Integer.toString(Math.abs(ran.nextInt()));
+		/*
 		if(gui.getTable().getRowCount()>=1) {
-			songToAdd[0] = "Null";
-		}
-		else {
 			songToAdd[0] = "1";
 		}
+		else {
+			songToAdd[0] = "2";
+		}
+		*/
 		
 		
 		Mp3File mp3file = null;

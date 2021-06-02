@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -33,7 +34,7 @@ import com.mpatric.mp3agic.ID3v1;
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
-
+import java.util.Random;
 
 
 public class GUI extends JFrame {
@@ -553,13 +554,14 @@ public class GUI extends JFrame {
                             songToAdd[5] = "Unknown";
                         }
                         // Store the songID
+                        Random ran = new Random();
+                        int tempId = Math.abs(ran.nextInt());
                         int idCheck = library.hasSong(songToAdd[1]);
                         if(idCheck > -1) {
                             songToAdd[0] = Integer.toString(idCheck);
-                            
                         }
                         else {
-                            songToAdd[0] = "Null";
+                            songToAdd[0] = Integer.toString(tempId);
                         }
                         try {
                         	songToAdd[7] = "";
