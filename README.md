@@ -10,8 +10,8 @@ Title         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 Artist        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VarChar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;       100\
 Genre         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VarChar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;       100\
 Release Year  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Int&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           100\
-Comments      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VarChar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;       100\
-Location      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VarChar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;       100\
+Comments      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VarChar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;       100\
+Location      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VarChar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;       100\
 playlists     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VarChar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;       100\
 \
 You can now run the program, also make sure to download the basicplayer package and add its files to the project\
