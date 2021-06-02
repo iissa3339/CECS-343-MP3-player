@@ -6,7 +6,7 @@ After that, click on Admin to the right of SQL, it will take you to phpmyadmin\
 Create a new database and name it "mp3" then add a table called "songs" to it\
 The table will have 8 columns with the following names in order and using this casing:\
 SongId        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VarChar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;       100         Default: NULL     A.I.\
-Title         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VarChar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;       100\
+Title         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VarChar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;       100\
 Artist        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VarChar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;       100\
 Genre         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VarChar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;       100\
 Release Year  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Int&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;           100\
